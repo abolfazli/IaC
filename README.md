@@ -1,9 +1,9 @@
 ## About this Repo
 
-Most modern solutions to provision resources on cloud and on-premise use automation systems like Terraform, Ansible and ... to bring Infrastructure as Code. Not only deployment is much faster but also configuration is consistent for all resources and it's a kind of perfect documentation for your network. on another hand troubleshooting is much easier since the overall deployment can be seen as a code.
+Most modern solutions to provision resources on cloud and on-premise use automation systems like Terraform, Ansible and ... to bring Infrastructure as Code. Not only deployment is much faster but also configuration is consistent for all resources and it's a kind of perfect documentation for your network. on another hand, troubleshooting is much easier since the overall deployment can be seen as a code.
 
-In this repo I tend to start preparing terraform and ansible codes to manage resources on Cloud and On-premis.
-the codes will be updated time to time as I test and deploy them and will be more completed.
+In this repo, I tend to start preparing terraform and ansible codes to manage resources on Cloud and On-premise.
+the codes will be updated from time to time as I test and deploy them and will be more completed.
 
 <!-- GETTING STARTED -->
 
@@ -12,11 +12,10 @@ This code is still under development. Do not use it for production purposes. The
 
 ### Prerequisites
 
-1. Having a gmail account :-)
+1. Having a Gmail account :-)
 2. activating your free tier GCP account: https://console.cloud.google.com
-3. Done.
 
-##### Note: with 3 month free GCP you have 300 USD credit. The estimated hourly cost is 2 USD which means you can run this LAB for about 150 hours. GCP will not overcharge you as other Public vendors do. this is why it is chosen for training LABs.
+##### Note: with 3 months free GCP you have 300 USD credit. The estimated hourly cost is 2 USD which means you can run this LAB for about 150 hours. GCP will not overcharge you as other Public vendors do. this is why it is chosen for training LABs.
 
 <!-- USAGE -->
 ### Usage
@@ -35,11 +34,7 @@ sh start.sh
 
 Have a coffee for 10 minutes and your LAB will be ready
 
-1. Having a gmail account :-)
-2. activating your free tier GCP account: https://console.cloud.google.com
-3. Done.
-
-##### Note: Always remember to **cleanup resources** when **NOT** needed to avoid additional charges.
+##### Note: 
 You can clean up all resources created by terraform with the following command:
 ```
 terraform destroy
@@ -58,7 +53,7 @@ My Github link: [https://github.com/abolfazli](https://github.com/abolfazli)
 <!-- ACKNOWLEDGMENTS -->
 ### Acknowledgments
 
-Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+Some useful linked to dig more:
 
 * [PAN-OS® Administrator’s Guide](https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-admin.html)
 * [Google Cloud documentation](https://cloud.google.com/docs/)
