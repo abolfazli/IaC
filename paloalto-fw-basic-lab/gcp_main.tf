@@ -275,6 +275,10 @@ resource "google_compute_instance" "firewall" {
   network_interface {
     subnetwork = "${google_compute_subnetwork.trust-sub-01.self_link}"
   }
+ 
+   network_interface {
+    subnetwork = "${google_compute_subnetwork.dmz-sub-01.self_link}"
+  }
 
   boot_disk {
     initialize_params {
