@@ -1,13 +1,13 @@
-## About The Project
+## About this Repo
 
-Cloud-native systems embrace microservices, containers, and modern system design to achieve speed and agility. They provide automated build and release stages to ensure consistent and quality code. But, that's only part of the story. How do you provision the cloud environments upon which these systems run?
-Modern cloud-native applications embrace the widely accepted practice of Infrastructure as a Code, or IaaC. With IaaC, you automate platform provisioning. You essentially apply software engineering practices such as testing and versioning to your DevOps practices. Your infrastructure and deployments are automated, consistent, and repeatable. Just as continuous delivery automated the traditional model of manual deployments, Infrastructure as a Code (IaaC) is evolving how application environments are managed.
+Most modern solutions to provision resources on cloud and on-premise use automation systems like Terraform, Ansible and ... to bring Infrastructure as Code. Not only deployment is much faster but also configuration is consistent for all resources and it's a kind of perfect documentation for your network. on another hand troubleshooting is much easier since the overall deployment can be seen as a code.
+
+In this repo I tend to start preparing terraform and ansible codes to manage resources on Cloud and On-premis.
+the codes will be updated time to time as I test and deploy them and will be more completed.
 
 <!-- GETTING STARTED -->
-## Getting Started
 
-
-### Disclaimer
+### Disclaimer for this first LAB
 This code is still under development. Do not use it for production purposes. The idea behind this automated code is to bring up an easy LAB to start Palo alto firewall configuration practices.
 
 ### Prerequisites
@@ -16,7 +16,9 @@ This code is still under development. Do not use it for production purposes. The
 2. activating your free tier GCP account: https://console.cloud.google.com
 3. Done.
 
-<!-- USAGE EXAMPLES -->
+##### Note: with 3 month free GCP you have 300 USD credit. The estimated hourly cost is 2 USD which means you can run this LAB for about 150 hours. GCP will not overcharge you as other Public vendors do. this is why it is chosen for training LABs.
+
+<!-- USAGE -->
 ### Usage
 
 1. go to: https://console.cloud.google.com
@@ -32,3 +34,38 @@ sh start.sh
 ```
 
 Have a coffee for 10 minutes and your LAB will be ready
+
+1. Having a gmail account :-)
+2. activating your free tier GCP account: https://console.cloud.google.com
+3. Done.
+
+##### Note: Always remember to **cleanup resources** when **NOT** needed to avoid additional charges.
+You can clean up all resources created by terraform with the following command:
+```
+terraform destroy
+```
+
+<!-- CONTACT -->
+### Contact
+
+Ping me on Linkedin: [Amir Abolfazli Linkedin Page](https://www.linkedin.com/in/amirabolfazli/)
+
+My Github link: [https://github.com/abolfazli](https://github.com/abolfazli)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+<!-- ACKNOWLEDGMENTS -->
+### Acknowledgments
+
+Use this space to list resources you find helpful and would like to give credit to. I've included a few of my favorites to kick things off!
+
+* [PAN-OS® Administrator’s Guide](https://docs.paloaltonetworks.com/pan-os/10-1/pan-os-admin.html)
+* [Google Cloud documentation](https://cloud.google.com/docs/)
+* [Terraform Google Cloud Platform Provider](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
+* [Terraform Palo Alto Networks Provider](https://registry.terraform.io/providers/PaloAltoNetworks/panos/latest/docs)
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+### LICENSE
+Please see [LICENSE.txt](LICENSE.txt)
