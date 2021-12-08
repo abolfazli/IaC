@@ -34,6 +34,9 @@ sh start.sh
 
 Have a coffee for 10 minutes and your LAB will be ready
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
 ##### Note: 
 You can clean up all resources created by terraform with the following command:
 ```
