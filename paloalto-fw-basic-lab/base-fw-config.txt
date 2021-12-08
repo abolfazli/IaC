@@ -2,11 +2,8 @@
 set deviceconfig system hostname pa-firewall
 
 set network interface ethernet ethernet1/1 layer3 dhcp-client 
-set network interface ethernet ethernet1/1 layer3 interface-management-profile allow-ping
 set network interface ethernet ethernet1/2 layer3 dhcp-client 
-set network interface ethernet ethernet1/2 layer3 interface-management-profile allow-ping
 set network interface ethernet ethernet1/3 layer3 dhcp-client 
-set network interface ethernet ethernet1/3 layer3 interface-management-profile allow-ping
 set network profiles interface-management-profile allow-ping ping yes
 
 set network virtual-router default interface [ ethernet1/1 ethernet1/2 ethernet1/3 ]
@@ -54,5 +51,9 @@ set rulebase nat rules internet-access destination any
 set rulebase nat rules internet-access service any
 
 set import network interface [ ethernet1/1 ethernet1/2 ethernet1/3 ]
+
+set network interface ethernet ethernet1/1 layer3 interface-management-profile allow-ping
+set network interface ethernet ethernet1/2 layer3 interface-management-profile allow-ping
+set network interface ethernet ethernet1/3 layer3 interface-management-profile allow-ping
 
 commit
