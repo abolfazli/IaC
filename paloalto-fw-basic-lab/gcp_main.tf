@@ -192,6 +192,9 @@ resource "google_compute_firewall" "allow-mgmt-icmp-ssh-https" {
   }
 
   source_ranges = ["0.0.0.0/0"]
+  log_config {
+    metadata = "EXCLUDE_ALL_METADATA"
+  }
 }
 
 // Adding GCP Firewall Rules for UNTRUST INBOUND ALL
@@ -203,6 +206,9 @@ resource "google_compute_firewall" "allow-all-untrust" {
     protocol = "all"
   }
   source_ranges = ["0.0.0.0/0"]
+  log_config {
+    metadata = "EXCLUDE_ALL_METADATA"
+  }
 }
 
 // Adding GCP Firewall Rules for TRUST INBOUND ALL
@@ -214,6 +220,9 @@ resource "google_compute_firewall" "allow-all-trust" {
     protocol = "all"
   }
   source_ranges = ["0.0.0.0/0"]
+  log_config {
+    metadata = "EXCLUDE_ALL_METADATA"
+  }
 }
 
 // Adding GCP Firewall Rules for DMZ INBOUND ALL
@@ -225,6 +234,9 @@ resource "google_compute_firewall" "allow-all-dmz" {
     protocol = "all"
   }
   source_ranges = ["0.0.0.0/0"]
+  log_config {
+    metadata = "EXCLUDE_ALL_METADATA"
+  }
 }
 
 /*
