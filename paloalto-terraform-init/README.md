@@ -1,1 +1,1 @@
-##Automating the configuration of Paloalto firewalls using terraform
+## Automating the configuration of Paloalto firewalls using terraform
