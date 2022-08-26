@@ -8,7 +8,7 @@ clear
 echo "-------------------------------------"
 echo "--> Setting up environment variables."
 echo "-------------------------------------"
-PROJECT_ID=$(gcloud projects list --format="value(projectId)")
+PROJECT_ID=$(gcloud projects list --format="value(projectId)" | head -n1)
 
 gcloud config set project $PROJECT_ID
 
@@ -17,7 +17,7 @@ SSH_KEY=$(cat .ssh/id_rsa.pub)
 
 export REGION="us-central1"
 export ZONE="us-central1-a"
-export INSTANCE_NAME="pa-fw-01"
+export INSTANCE_NAME="eve-ng"
 
 gcloud config set compute/zone $ZONE
 gcloud config set compute/region $REGION
@@ -55,20 +55,17 @@ gcloud compute networks create $UNTRUST_NET_NAME --project=$PROJECT_ID --subnet-
 clear
 sleep 2s
 
-# Creating 4 firewall rules to allow all trafics
+# Creating 2 firewall rules to allow all traffics
 #==========================================
 clear
 echo "----------------------------"
 echo "--> Creating Firewall rules."
 echo "----------------------------"
 sleep 1s
-gcloud compute --project=amir-gcp5 firewall-rules create ingress-eve --direction=INGRESS --priority=1000 --network=trust --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
-gcloud compute --project=amir-gcp5 firewall-rules create ingress-eve --direction=ENGRESS --priority=1000 --network=trust --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
 
-
-gcloud compute --project=$PROJECT_ID firewall-rules create allow-all-trust --direction=INGRESS --priority=1000 --network=$TRUST_NET_NAME --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
+gcloud compute --project=$PROJECT_ID firewall-rules create ingress-eve --direction=INGRESS --priority=1000 --network=$TRUST_NET_NAME --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
 clear
-gcloud compute --project=$PROJECT_ID firewall-rules create allow-all-untrust --direction=INGRESS --priority=1000 --network=$UNTRUST_NET_NAME --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
+gcloud compute --project=$PROJECT_ID firewall-rules create engress-eve --direction=ENGRESS --priority=1000 --network=$TRUST_NET_NAME --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
 clear
 sleep 2s
 
@@ -87,66 +84,37 @@ gcloud compute images create nested-ubuntu-focal \
 echo "Done."
 sleep 2s
 
-# Creating firewall instance
+# Creating EVE-ng instance
 #==========================================
 clear
 echo "-------------------------------"
-echo "--> Creating firewall instance."
+echo "--> Creating EVE-ng instance."
 echo "-------------------------------"
 sleep 1s
-gcloud compute instances create eve-ng \
---project=amir-gcp5 \
---zone=us-central1-a \
+gcloud compute instances create $INSTANCE_NAME \
+--project=$PROJECT_ID \
+--zone=$ZONE \
 --machine-type=n2-highmem-4 \
 --network-interface=network-tier=PREMIUM,subnet=management \
 --can-ip-forward \
 --maintenance-policy=MIGRATE \
 --provisioning-model=STANDARD \
---create-disk=auto-delete=yes,boot=yes,device-name=eve-ng,image=projects/amir-gcp5/global/images/nested-ubuntu-focal,mode=rw,size=50,type=projects/amir-gcp5/zones/us-central1-a/diskTypes/pd-ssd \
+--create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE_NAME,image=projects/$PROJECT_ID/global/images/nested-ubuntu-focal,mode=rw,size=50,type=projects/$PROJECT_ID/zones/$ZONE/diskTypes/pd-ssd \
 --no-shielded-secure-boot \
 --shielded-vtpm \
 --shielded-integrity-monitoring \
 --reservation-affinity=any
 
 
-FIREWALL_MGMT_EXIP=$(gcloud compute instances describe $INSTANCE_NAME --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+EVE_MGMT_EXIP=$(gcloud compute instances describe $INSTANCE_NAME --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
 
 echo "Done."
 sleep 2s
 
-# Creating system routes
-#==========================================
-clear
-echo "---------------------------"
-echo "--> Creating system routes."
-echo "---------------------------"
-sleep 1s
-gcloud beta compute routes create trust-to-untrust --project=$PROJECT_ID --network=$TRUST_NET_NAME --priority=1000 --destination-range=$UNTRUST_NET_RNG --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-gcloud beta compute routes create trust-ro-dmz --project=$PROJECT_ID --network=$TRUST_NET_NAME --priority=1000 --destination-range=$DMZ_NET_RNG --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-gcloud beta compute routes create trust-to-internet --project=$PROJECT_ID --network=$TRUST_NET_NAME --priority=100 --destination-range=0.0.0.0/0 --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-clear
-gcloud beta compute routes create dmz-to-untrust --project=$PROJECT_ID --network=$DMZ_NET_NAME --priority=1000 --destination-range=$UNTRUST_NET_RNG --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-gcloud beta compute routes create dmz-ro-trust --project=$PROJECT_ID --network=$DMZ_NET_NAME --priority=1000 --destination-range=$TRUST_NET_RNG --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-gcloud beta compute routes create dmz-to-internet --project=$PROJECT_ID --network=$DMZ_NET_NAME --priority=100 --destination-range=0.0.0.0/0 --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-clear
-gcloud beta compute routes create untrust-ro-trust --project=$PROJECT_ID --network=$UNTRUST_NET_NAME --priority=1000 --destination-range=$TRUST_NET_RNG --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-gcloud beta compute routes create untrust-ro-dmz --project=$PROJECT_ID --network=$UNTRUST_NET_NAME --priority=1000 --destination-range=$DMZ_NET_RNG --next-hop-instance=$INSTANCE_NAME --next-hop-instance-zone=$ZONE
-echo "Done."
-sleep 2s
 
-# PaloAlto Firewall bootup
-#==========================================
-clear
-echo "Waiting for Firewall to boots up..."
-while true;
-do
-  ping -c1 $FIREWALL_MGMT_EXIP >/dev/null 2>&1
-  if [ $? -eq 0 ]
-  then
-    sleep 2m
-    exit 0
-  fi
-done
+ssh -o "StrictHostKeyChecking no" -i .ssh/id_rsa admin@$EVE_MGMT_EXIP
 
-
-ssh -o "StrictHostKeyChecking no" -i .ssh/id_rsa admin@$FIREWALL_MGMT_EXIP
+sudo -i
+wget -O - https://www.eve-ng.net/focal/install-eve.sh | bash -i
+apt update
+apt upgrade
