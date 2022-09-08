@@ -112,4 +112,14 @@ echo "Done."
 sleep 2s
 
 
+sudo -i
+wget -O - https://www.eve-ng.net/focal/install-eve.sh | bash -i
+apt update
+apt upgrade
+
 ssh -o "StrictHostKeyChecking no" -i .ssh/id_rsa admin@$EVE_MGMT_EXIP "sudo -i && wget -O - https://www.eve-ng.net/focal/install-eve.sh | bash -i && apt update && apt upgrade && reboot"
+
+
+
+
+end
