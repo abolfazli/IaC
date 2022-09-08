@@ -65,7 +65,7 @@ sleep 1s
 
 gcloud compute --project=$PROJECT_ID firewall-rules create ingress-eve --direction=INGRESS --priority=1000 --network=$TRUST_NET_NAME --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
 clear
-gcloud compute --project=$PROJECT_ID firewall-rules create engress-eve --direction=ENGRESS --priority=1000 --network=$TRUST_NET_NAME --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
+gcloud compute --project=$PROJECT_ID firewall-rules create egress-eve --direction=EGRESS --priority=1000 --network=$TRUST_NET_NAME --action=ALLOW --rules=all --source-ranges=0.0.0.0/0 --enable-logging --logging-metadata=exclude-all
 clear
 sleep 2s
 
