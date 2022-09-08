@@ -95,7 +95,7 @@ gcloud compute instances create $INSTANCE_NAME \
 --project=$PROJECT_ID \
 --zone=$ZONE \
 --machine-type=n2-highmem-4 \
---network-interface=network-tier=PREMIUM,subnet=management \
+--network-interface=network-tier=PREMIUM,subnet=$TRUST_NET_NAME \
 --can-ip-forward \
 --maintenance-policy=MIGRATE \
 --provisioning-model=STANDARD \
