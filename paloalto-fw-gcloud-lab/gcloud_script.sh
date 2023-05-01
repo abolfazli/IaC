@@ -18,6 +18,8 @@ gcloud config set project $PROJECT_ID
 
 ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y >/dev/null 2>&1
 SSH_KEY=$(cat .ssh/id_rsa.pub)
+SSH_KEY=(admin:$SSH_KEY)
+echo $SSH_KEY
 
 export REGION="us-central1"
 export ZONE="us-central1-a"
@@ -116,7 +118,7 @@ sleep 1s
 gcloud compute instances create $INSTANCE_NAME \
         --description="Palo Alto Firewall" \
         --zone=$ZONE \
-        --create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE_NAME,image=projects/paloaltonetworksgcp-public/global/images/vmseries-flex-bundle2-1013,mode=rw,size=60 \
+        --create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE_NAME,image=projects/paloaltonetworksgcp-public/global/images/vmseries-flex-bundle2-1101,mode=rw,size=60 \
         --maintenance-policy=TERMINATE \
         --machine-type=n1-standard-4 \
         --network-interface=network-tier=PREMIUM,network=$MGMT_NET_NAME,subnet=$MGMT_NET_NAME \
@@ -169,7 +171,7 @@ done
 
 echo "Firewall successfully boots up :-)"
 
-ssh -o "StrictHostKeyChecking no" -i .ssh/id_rsa admin@$FIREWALL_MGMT_EXIP
+ssh -o "HostKeyAlgorithms=+ssh-rsa" -o "StrictHostKeyChecking no" -i .ssh/id_rsa admin@$FIREWALL_MGMT_EXIP
 
 # PaloAlto Firewall basic configuration
 #==========================================
