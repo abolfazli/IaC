@@ -182,7 +182,7 @@ echo "------------------------------"
 sleep 1s
 
 configure
-set mgt-config users admin
+set mgt-config users admin password
 AAAaaa.123
 AAAaaa.123
 
