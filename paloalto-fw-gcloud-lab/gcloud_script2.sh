@@ -12,30 +12,32 @@
 
 ## Warning
 #------------------------------------------------------------------------------------
-
+clear
 read -p "Do you want that you shouldn't run this script in Tangerine's network and this script only should be run in a test network in your own Prive GCP account? (Enter 'yes' to continue): " i_accept
 
-if [[ "${i_accept,,}" != "yes" ]]; then
+i_accept=$(echo "$i_accept" | tr '[:upper:]' '[:lower:]')
+
+if [[ "$i_accept" != "yes" ]]; then
   echo "Script execution cancelled."
   exit 0
 fi
 #------------------------------------------------------------------------------------
 
-gcloud auth login
+#gcloud auth login
 clear
-
 ## Project ID, Region and Zone
 #------------------------------------------------------------------------------------
 REGION="us-east1"
 ZONE="us-east1-b"
 
+read -p "Enter your Project ID: " PROJECT_ID
+
 echo "Default region is: $REGION"
 echo "Default zone is:   $ZONE"
 
-read -p "Enter your Project ID: " PROJECT_ID
 read -p "Do you want to change the default region and zone? (y/n): " change_defaults
 
-if [ "$change_defaults" == "y" || $change_defaults == "yes" || $change_defaults == "Y" || $change_defaults == "y" ]]; then
+if [[ "$change_defaults" == "y" || $change_defaults == "yes" || $change_defaults == "Y" || $change_defaults == "y" ]]; then
   read -p "Enter the new default region: " new_region
   REGION="$new_region"
   read -p "Enter the new default zone: " new_zone
@@ -44,6 +46,12 @@ fi
 #------------------------------------------------------------------------------------
 
 read -p "Enter new firewall name: " INSTANCE_NAME
+
+PROJECT_ID=$(echo "$PROJECT_ID" | tr '[:upper:]' '[:lower:]')
+REGION=$(echo "$REGION" | tr '[:upper:]' '[:lower:]')
+ZONE=$(echo "$ZONE" | tr '[:upper:]' '[:lower:]')
+INSTANCE_NAME=$(echo "$INSTANCE_NAME" | tr '[:upper:]' '[:lower:]')
+
 
 ## Ask for SSH Key 
 #------------------------------------------------------------------------------------
@@ -65,8 +73,11 @@ echo "SSH Public Key is: "$SSH_KEY
 echo " "
 #------------------------------------------------------------------------------------
 
+
+
 # create a VPC
 #------------------------------------------------------------------------------------
+echo "Creating VPC networks...."
 create_vpc() {
   local vpc_name=$1
   local subnet_range=$2
@@ -89,12 +100,17 @@ create_vpc "dmz" "192.168.3.0/24"
 # GCP Firewall Configurations: Allow all traffic in each VPC
 #------------------------------------------------------------------------------------
 for vpc_name in "management" "trust" "untrust" "dmz"; do
-  gcloud compute firewall-rules create "$vpc_name-allow-all" \
-    --project "$PROJECT_ID" \
-    --network "$vpc_name" \
-    --allow all \
-    --source-ranges "$subnet_range"
+	gcloud compute  --project=$PROJECT_ID firewall-rules create "$vpc_name-allow-all" \
+                --direction=INGRESS \
+                --priority=1000 \
+                --network="$vpc_name" \
+                --action=ALLOW \
+                --rules=all \
+                --source-ranges=0.0.0.0/0 \
+                --enable-logging \
+                --logging-metadata=exclude-all
 done
+
 #------------------------------------------------------------------------------------
 
 # Create static route for inter-VPC traffic
@@ -124,13 +140,13 @@ gcloud compute instances create $INSTANCE_NAME \
         --create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE_NAME,image=projects/paloaltonetworksgcp-public/global/images/vmseries-flex-bundle2-1101,mode=rw,size=60 \
         --maintenance-policy=TERMINATE \
         --machine-type=n1-standard-4 \
-        --network-interface=network-tier=PREMIUM,network=$MGMT_NET_NAME,subnet=$MGMT_NET_NAME \
-        --network-interface=network-tier=PREMIUM,network=$UNTRUST_NET_NAME,subnet=$UNTRUST_NET_NAME \
-        --network-interface=network-tier=PREMIUM,network=$TRUST_NET_NAME,subnet=$TRUST_NET_NAME,no-address \
+        --network-interface=network-tier=PREMIUM,network=management,subnet=management-subnet \
+        --network-interface=network-tier=PREMIUM,network=untrust,subnet=untrust-subnet \
+        --network-interface=network-tier=PREMIUM,network=trust,subnet=trust-subnet,no-address \
         --metadata=ssh-keys="$SSH_KEY" \
         --boot-disk-auto-delete \
         --tags=firewall \
-        --labels=type=firewall 
+        --labels=type=firewall
 
 FIREWALL_MGMT_EXIP=$(gcloud compute instances describe $INSTANCE_NAME --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
 
