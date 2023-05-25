@@ -9,6 +9,18 @@
 # 6. We need a SSH Key to be created and imported to our Palo Alto firewall
 #gcloud compute images list --project paloaltonetworksgcp-public --no-standard-images --uri | grep vmseries-flex-bundle2-11
 
+#==============================================================================================
+#|                                         WARNING                                             |
+#==============================================================================================
+# What are the requirements to create a test LAB:
+# 1. Createing a GCP Project that contains all your configs.
+# 2. Create 4 VPCs for each firewall interface: management, trust, untrust, dmz and assign a subnet range for them
+# 3. GCP has it's own firewall that we are going to allow all traffic in that to reduce complexity.
+# 4. We should define Region and Zone that all objects should be created
+# 5. We should define static routes for inter-vpc and internet communication to go through our firewall
+# 6. We need a SSH Key to be created and imported to our Palo Alto firewall
+#gcloud compute images list --project paloaltonetworksgcp-public --no-standard-images --uri | grep vmseries-flex-bundle2-11
+
 
 ## Warning
 #------------------------------------------------------------------------------------
