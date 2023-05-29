@@ -25,7 +25,7 @@
 ## Warning
 #------------------------------------------------------------------------------------
 clear
-read -p "Do you want that you shouldn't run this script in Production network and this script only should be run in a test network in your own Prive GCP account? (Enter 'yes' to continue): " i_accept
+read -p "Do you know that you should be running this script in a test network in your own private GCP account rather than in the production network? (Enter 'yes' to continue): " i_accept
 
 i_accept=$(echo "$i_accept" | tr '[:upper:]' '[:lower:]')
 
