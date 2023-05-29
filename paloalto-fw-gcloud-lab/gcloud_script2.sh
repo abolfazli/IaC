@@ -35,7 +35,7 @@ if [[ "$i_accept" != "yes" ]]; then
 fi
 #------------------------------------------------------------------------------------
 
-#gcloud auth login
+gcloud auth login
 clear
 ## Project ID, Region and Zone
 #------------------------------------------------------------------------------------
@@ -70,8 +70,7 @@ INSTANCE_NAME=$(echo "$INSTANCE_NAME" | tr '[:upper:]' '[:lower:]')
 read -p "Do you want to generate a new SSH key? (yes/No): " need_sshkey
 
 if [[ $need_sshkey == "Yes" || $need_sshkey == "yes" || $need_sshkey == "Y" || $need_sshkey == "y" ]]; then
-  #ssh-keygen -t rsa -b 4096 -C "abolfazli@outlook.com"
-  #ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y >/dev/null 2>&1
+  ssh-keygen -t rsa -N '' -f ~/.ssh/id_rsa <<< y >/dev/null 2>&1
   echo "New SSH key generated."
 elif [[ $need_sshkey == "No" || $need_sshkey == "no" || $need_sshkey == "N" || $need_sshkey == "n" || -z "$need_sshkey" ]]; then
   echo "No new SSH key generated."
