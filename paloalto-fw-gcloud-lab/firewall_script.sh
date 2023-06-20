@@ -190,11 +190,16 @@ set network interface ethernet ethernet1/4 layer3 dhcp-client
 set network interface ethernet ethernet1/4 layer3 interface-management-profile allow-ping
 
 set network virtual-router default interface [ ethernet1/1 ethernet1/2 ethernet1/3 ethernet1/4 ]
-set network virtual-router default routing-table ip static-route default-route nexthop ip-address 10.2.1.1
-set network virtual-router default routing-table ip static-route default-route interface ethernet1/1
-set network virtual-router default routing-table ip static-route default-route metric 10
-set network virtual-router default routing-table ip static-route default-route destination 0.0.0.0/0
-set network virtual-router default routing-table ip static-route default-route route-table unicast 
+set network virtual-router default routing-table ip static-route default-route-1 nexthop ip-address 10.2.1.1
+set network virtual-router default routing-table ip static-route default-route-1 interface ethernet1/1
+set network virtual-router default routing-table ip static-route default-route-1 metric 10
+set network virtual-router default routing-table ip static-route default-route-1 destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route default-route-1 route-table unicast 
+set network virtual-router default routing-table ip static-route default-route-2 nexthop ip-address 10.2.2.1
+set network virtual-router default routing-table ip static-route default-route-2 interface ethernet1/2
+set network virtual-router default routing-table ip static-route default-route-2 metric 20
+set network virtual-router default routing-table ip static-route default-route-2 destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route default-route-2 route-table unicast
 
 set zone untrust network layer3 ethernet1/1
 set zone untrust network layer3 ethernet1/2
