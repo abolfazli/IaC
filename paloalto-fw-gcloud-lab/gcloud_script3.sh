@@ -78,112 +78,65 @@ else
   echo "Invalid input. Please type Yes or No."
 fi
 
-SSH_KEY=$(cat .ssh/id_rsa.pub)
+SSH_KEY=$(cat ~/.ssh/id_rsa.pub)
 SSH_KEY=("admin:$SSH_KEY")
 echo "SSH Public Key is: "$SSH_KEY
 echo " "
 #------------------------------------------------------------------------------------
 # create a VPC
 #------------------------------------------------------------------------------------
-# Define the network configurations
-NETWORKS=(
-    "mgmt 10.0.0.0/16"
-    "trust 10.1.0.0/16"
-    "untrust 10.2.0.0/16"
-    "dmz 10.3.0.0/16"
-)
-
-# Create networks using a loop
-for NETWORK in "${NETWORKS[@]}"; do
-    NETWORK_NAME=$(echo "$NETWORK" | cut -d' ' -f1)
-    NETWORK_RANGE=$(echo "$NETWORK" | cut -d' ' -f2)
-
-    gcloud compute networks create "$NETWORK_NAME" \
-        --project="$PROJECT_ID" \
-        --subnet-mode=auto \
-        --bgp-routing-mode=regional
-
-    gcloud compute networks subnets create "$NETWORK_NAME-subnet" \
-        --project="$PROJECT_ID" \
-        --region="$REGION" \
-        --network="$NETWORK_NAME" \
-        --range="$NETWORK_RANGE"
-done
 
 # Define the subnet configurations
 SUBNETS=(
     "management management-subnet 10.0.0.0/24"
-    "trust trust-subnet1 10.1.1.0/24"
-    "trust trust-subnet2 10.1.2.0/24"
-    "trust trust-subnet3 10.1.3.0/24"
     "untrust untrust-subnet1 10.2.1.0/24"
     "untrust untrust-subnet2 10.2.2.0/24"
-    "dmz dmz-subnet1 10.3.1.0/24"
-    "dmz dmz-subnet2 10.3.2.0/24"
+    "trust trust-subnet 10.1.1.0/24"
+    "dmz dmz-subnet 10.3.1.0/24"
 )
 
 # Create subnets using a loop
 for SUBNET in "${SUBNETS[@]}"; do
-    NETWORK=$(echo "$SUBNET" | cut -d' ' -f1)
-    SUBNET_NAME=$(echo "$SUBNET" | cut -d' ' -f2)
-    SUBNET_RANGE=$(echo "$SUBNET" | cut -d' ' -f3)
+    VPC_SUBNET_NAME=$(echo "$SUBNET" | cut -d' ' -f2)
+    VPC_SUBNET_RANGE=$(echo "$SUBNET" | cut -d' ' -f3)
+    clear
+    echo "===================================================="
+    echo -e "Creating Resources for $VPC_SUBNET_NAME network"
+    echo "===================================================="
 
-    gcloud compute networks subnets create "$SUBNET_NAME" \
+    gcloud compute networks create "$VPC_SUBNET_NAME" --project "$PROJECT_ID" --subnet-mode custom --bgp-routing-mode global
+
+    gcloud compute networks subnets create "$VPC_SUBNET_NAME" \
        --project="$PROJECT_ID" \
        --region="$REGION" \
-       --network="$NETWORK" \
-       --range="$SUBNET_RANGE"
-    gcloud compute routes create "$vpc_name-subnet1-inter-vpc-route" \
+       --network="$VPC_SUBNET_NAME" \
+       --range="$VPC_SUBNET_RANGE"
+
+    gcloud compute routes create "$VPC_SUBNET_NAME-inter-vpc-route" \
        --project "$PROJECT_ID" \
-       --network "$vpc_name" \
+       --network "$VPC_SUBNET_NAME" \
        --destination-range "10.0.0.0/8" \
        --next-hop-instance "$INSTANCE_NAME" \
        --next-hop-instance-zone "$REGION"
 
-    gcloud compute routes create "default-$vpc_name-subnet1-internet-route" \
+    gcloud compute routes create "default-$VPC_SUBNET_NAME-internet-route" \
        --project "$PROJECT_ID" \
-       --network "$vpc_name" \
+       --network "$VPC_SUBNET_NAME" \
        --destination-range "0.0.0.0/0" \
        --next-hop-instance "$INSTANCE_NAME" \
        --next-hop-instance-zone "$REGION"
-
-    gcloud compute  --project=$PROJECT_ID firewall-rules create "$vpc_name-allow-all" \
+    
+    gcloud compute  --project=$PROJECT_ID firewall-rules create "$VPC_SUBNET_NAME-allow-all" \
        --direction=INGRESS \
        --priority=1000 \
-       --network="$vpc_name" \
+       --network="$VPC_SUBNET_NAME" \
        --action=ALLOW \
        --rules=all \
        --source-ranges=0.0.0.0/0 \
        --enable-logging \
        --logging-metadata=exclude-all
 done
-
-
-####
-
-create_vpc() {
-  local vpc_name=$1
-  local subnet_range=$2
-
-  clear
-
-  gcloud compute networks create "$vpc_name" --project "$PROJECT_ID" --subnet-mode custom --bgp-routing-mode global
-
-  gcloud compute networks subnets create "$vpc_name-subnet1" \
-    --project "$PROJECT_ID" \
-    --range "$subnet_range" \
-    --network "$vpc_name" \
-    --region "$REGION"
-
-
-}
-
-create_vpc "management" "10.0.1.0/24"
-create_vpc "trust" "10.1.1.0/24"
-create_vpc "untrust" "10.2.1.0/24"
-create_vpc "dmz" "10.3.1.0/24"
-####
-
+clear
 gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com runtimeconfig.googleapis.com
 
 gcloud compute instances create $INSTANCE_NAME \
@@ -192,14 +145,11 @@ gcloud compute instances create $INSTANCE_NAME \
         --create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE_NAME,image=projects/paloaltonetworksgcp-public/global/images/vmseries-flex-bundle2-1101,mode=rw,size=60 \
         --maintenance-policy=TERMINATE \
         --machine-type=n2-standard-8 \
-        --network-interface=network-tier=PREMIUM,network=management,subnet=management-subnet \
-        --network-interface=network-tier=PREMIUM,network=untrust,subnet=untrust-subnet1 \
-        --network-interface=network-tier=PREMIUM,network=untrust,subnet=untrust-subnet2 \
-        --network-interface=network-tier=PREMIUM,network=trust,subnet=trust-subnet1,no-address \
-        --network-interface=network-tier=PREMIUM,network=trust,subnet=trust-subnet2,no-address \
-        --network-interface=network-tier=PREMIUM,network=trust,subnet=trust-subnet3,no-address \
-        --network-interface=network-tier=PREMIUM,network=dmz,subnet=dmz-subnet1,no-address \
-        --network-interface=network-tier=PREMIUM,network=dmz,subnet=dmz-subnet2,no-address \
+        --network-interface=network-tier=PREMIUM,network=management-subnet,subnet=management-subnet \
+        --network-interface=network-tier=PREMIUM,network=untrust-subnet1,subnet=untrust-subnet1 \
+        --network-interface=network-tier=PREMIUM,network=untrust-subnet2,subnet=untrust-subnet2 \
+        --network-interface=network-tier=PREMIUM,network=trust-subnet,subnet=trust-subnet,no-address \
+        --network-interface=network-tier=PREMIUM,network=dmz-subnet,subnet=dmz-subnet,no-address \
         --metadata=ssh-keys="$SSH_KEY" \
         --boot-disk-auto-delete \
         --tags=firewall \
@@ -208,11 +158,44 @@ gcloud compute instances create $INSTANCE_NAME \
 FIREWALL_MGMT_EXIP=$(gcloud compute instances describe $INSTANCE_NAME --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
 
 while ! ping -c1 $FIREWALL_MGMT_EXIP &> /dev/null; do
-  echo "$FIREWALL_MGMT_EXIP is not reachable"
-  sleep 5
+  echo -e "$FIREWALL_MGMT_EXIP is not reachable"
+  sleep 20
 done
-echo "$FIREWALL_MGMT_EXIP is now reachable . we should wait some minutes to complete booting process"
+clear
+echo -e "\n\n$FIREWALL_MGMT_EXIP is now reachable . we should wait 10 minutes to complete booting process\n"
 sleep 500
-echo "When firewall boots up use the following commands to set password:\n\n# configure\n# set mgt-config users admin password\n"
 
-ssh -o "HostKeyAlgorithms=+ssh-rsa" -o "StrictHostKeyChecking no" -i .ssh/id_rsa admin@$FIREWALL_MGMT_EXIP
+echo -e "When firewall boots up use the following commands to set password:\n\n# configure\n# set mgt-config users admin password\n\n"
+
+ssh -o "HostKeyAlgorithms=+ssh-rsa" -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa admin@$FIREWALL_MGMT_EXIP
+
+#API_KEY="API KEY"
+#X-PAN-KEY="X PAN KEY"
+
+: '
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"hostname": "pa-fw-01"}' https://$FIREWALL_MGMT_EXIP/api/?type=op&cmd=<request><system><hostname></hostname></system></request>
+
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"type": "layer3", "dhcp": "client"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/ethernet/entry[@name='ethernet1/1']/layer3
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"interface-management-profile": "allow-ping"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/ethernet/entry[@name='ethernet1/1']/layer3
+...
+
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"ping": "yes"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/shared/network/profiles/interface-management-profile/entry[@name='allow-ping']
+
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"interface": ["ethernet1/1", "ethernet1/2", "ethernet1/3"]}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/virtual-router/entry[@name='default']/interface
+
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"ip": {"static-route": [{"name": "default-route", "destination": "0.0.0.0/0", "nexthop": {"ip-address": "192.168.1.1"}, "interface": "ethernet1/1", "route-table": "unicast", "metric": "10"}]}}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/virtual-router/entry[@name='default']/routing-table/ip
+
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/1"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='untrust']
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/2"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='trust']
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/3"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='dmz']
+
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"color": "color22"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='trust']
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"color": "color1"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='untrust']
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"color": "color21"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='dmz']
+
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"to": ["dmz", "untrust"], "from": "trust", "action": "allow"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='trust-to-other-permit']
+...
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"to": "untrust", "from": ["dmz", "trust"], "source-translation": {"dynamic-ip-and-port": {"interface-address": "interface ethernet1/1"}}}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules/entry[@name='internet-access']
+curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"interface": ["ethernet1/1", "ethernet1/2", "ethernet1/3"]}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/import
+curl -X POST -H "$X-PAN-KEY: $API_KEY" https://$FIREWALL_MGMT_EXIP/api/?type=commit&cmd=<commit></commit>
+'
