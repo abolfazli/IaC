@@ -175,3 +175,64 @@ curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"to": "untrust", "from": ["dmz", "tr
 curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"interface": ["ethernet1/1", "ethernet1/2", "ethernet1/3"]}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/import
 curl -X POST -H "$X-PAN-KEY: $API_KEY" https://$FIREWALL_MGMT_EXIP/api/?type=commit&cmd=<commit></commit>
 '
+
+
+: '
+set deviceconfig system hostname pa-fw-01
+
+set network interface ethernet ethernet1/1 layer3 dhcp-client 
+set network interface ethernet ethernet1/1 layer3 interface-management-profile allow-ping
+set network interface ethernet ethernet1/2 layer3 dhcp-client 
+set network interface ethernet ethernet1/2 layer3 interface-management-profile allow-ping
+set network interface ethernet ethernet1/3 layer3 dhcp-client 
+set network interface ethernet ethernet1/3 layer3 interface-management-profile allow-ping
+set network profiles interface-management-profile allow-ping ping yes
+
+set network virtual-router default interface [ ethernet1/1 ethernet1/2 ethernet1/3 ]
+set network virtual-router default routing-table ip static-route default-route nexthop ip-address 192.168.1.1
+set network virtual-router default routing-table ip static-route default-route interface ethernet1/1
+set network virtual-router default routing-table ip static-route default-route metric 10
+set network virtual-router default routing-table ip static-route default-route destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route default-route route-table unicast 
+
+set zone untrust network layer3 ethernet1/1
+set zone trust network layer3 ethernet1/2
+set zone dmz network layer3 ethernet1/3
+set tag trust color color22
+set tag untrust color color1
+set tag dmz color color21
+
+set rulebase security rules trust-to-other-permit to [ dmz untrust ]
+set rulebase security rules trust-to-other-permit from trust
+set rulebase security rules trust-to-other-permit source any
+set rulebase security rules trust-to-other-permit destination any
+set rulebase security rules trust-to-other-permit source-user any
+set rulebase security rules trust-to-other-permit category any
+set rulebase security rules trust-to-other-permit application any
+set rulebase security rules trust-to-other-permit service application-default
+set rulebase security rules trust-to-other-permit source-hip any
+set rulebase security rules trust-to-other-permit destination-hip any
+set rulebase security rules trust-to-other-permit action allow
+set rulebase security rules dmz-to-other-permit to [ trust untrust ]
+set rulebase security rules dmz-to-other-permit from dmz
+set rulebase security rules dmz-to-other-permit source any
+set rulebase security rules dmz-to-other-permit destination any
+set rulebase security rules dmz-to-other-permit source-user any
+set rulebase security rules dmz-to-other-permit category any
+set rulebase security rules dmz-to-other-permit application any
+set rulebase security rules dmz-to-other-permit service application-default
+set rulebase security rules dmz-to-other-permit source-hip any
+set rulebase security rules dmz-to-other-permit destination-hip any
+set rulebase security rules dmz-to-other-permit action allow
+
+set rulebase nat rules internet-access source-translation dynamic-ip-and-port interface-address interface ethernet1/1
+set rulebase nat rules internet-access to untrust
+set rulebase nat rules internet-access from [ dmz trust ]
+set rulebase nat rules internet-access source any
+set rulebase nat rules internet-access destination any
+set rulebase nat rules internet-access service any
+
+set import network interface [ ethernet1/1 ethernet1/2 ethernet1/3 ]
+
+commit
+'
