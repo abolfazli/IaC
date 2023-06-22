@@ -239,7 +239,7 @@ set rulebase security rules dmz-to-other-permit source-hip any
 set rulebase security rules dmz-to-other-permit destination-hip any
 set rulebase security rules dmz-to-other-permit action allow
 
-set rulebase nat rules internet-access source-translation dynamic-ip-and-port interface-address interface ethernet1/3
+set rulebase nat rules internet-access source-translation dynamic-ip-and-port interface-address interface ethernet1/1
 set rulebase nat rules internet-access to untrust
 set rulebase nat rules internet-access from [ dmz trust ]
 set rulebase nat rules internet-access source any
