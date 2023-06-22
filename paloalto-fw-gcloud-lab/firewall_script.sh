@@ -192,15 +192,15 @@ set network interface ethernet ethernet1/4 layer3 interface-management-profile a
 
 set network virtual-router default interface [ ethernet1/1 ethernet1/2 ethernet1/3 ethernet1/4 ]
 
-set network virtual-router default routing-table ip static-route default-route nexthop ip-address 10.2.1.1
-set network virtual-router default routing-table ip static-route default-route bfd profile None
-set network virtual-router default routing-table ip static-route default-route interface ethernet1/1
-set network virtual-router default routing-table ip static-route default-route metric 10
-set network virtual-router default routing-table ip static-route default-route destination 0.0.0.0/0
-set network virtual-router default routing-table ip static-route default-route route-table unicast
+set network virtual-router default routing-table ip static-route default-route-1 nexthop ip-address 10.2.1.1
+set network virtual-router default routing-table ip static-route default-route-1 bfd profile None
+set network virtual-router default routing-table ip static-route default-route-1 interface ethernet1/1
+set network virtual-router default routing-table ip static-route default-route-1 metric 10
+set network virtual-router default routing-table ip static-route default-route-1 destination 0.0.0.0/0
+set network virtual-router default routing-table ip static-route default-route-1 route-table unicast
 
 set network virtual-router default routing-table ip static-route default-route-2 nexthop ip-address 10.2.2.1
-set network virtual-router default routing-table ip static-route default-route bfd profile None
+set network virtual-router default routing-table ip static-route default-route-2 bfd profile None
 set network virtual-router default routing-table ip static-route default-route-2 interface ethernet1/2
 set network virtual-router default routing-table ip static-route default-route-2 metric 20
 set network virtual-router default routing-table ip static-route default-route-2 destination 0.0.0.0/0
@@ -239,7 +239,7 @@ set rulebase security rules dmz-to-other-permit source-hip any
 set rulebase security rules dmz-to-other-permit destination-hip any
 set rulebase security rules dmz-to-other-permit action allow
 
-set rulebase nat rules internet-access source-translation dynamic-ip-and-port interface-address interface ethernet1/1
+set rulebase nat rules internet-access source-translation dynamic-ip-and-port interface-address interface ethernet1/3
 set rulebase nat rules internet-access to untrust
 set rulebase nat rules internet-access from [ dmz trust ]
 set rulebase nat rules internet-access source any
