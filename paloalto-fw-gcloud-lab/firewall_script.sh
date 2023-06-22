@@ -93,14 +93,14 @@ for SUBNET in "${SUBNETS[@]}"; do
        --network "$VPC_SUBNET_NAME" \
        --destination-range "10.0.0.0/8" \
        --next-hop-instance "$INSTANCE_NAME" \
-       --next-hop-instance-zone "$REGION"
+       --next-hop-instance-zone "$ZONE"
 
     gcloud compute routes create "default-$VPC_SUBNET_NAME-internet-route" \
        --project "$PROJECT_ID" \
        --network "$VPC_SUBNET_NAME" \
        --destination-range "0.0.0.0/0" \
        --next-hop-instance "$INSTANCE_NAME" \
-       --next-hop-instance-zone "$REGION"
+       --next-hop-instance-zone "$ZONE"
     
     gcloud compute  --project=$PROJECT_ID firewall-rules create "$VPC_SUBNET_NAME-allow-all" \
        --direction=INGRESS \
