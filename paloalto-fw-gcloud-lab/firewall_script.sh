@@ -129,7 +129,8 @@ gcloud compute instances create $INSTANCE_NAME \
         --metadata=ssh-keys="$SSH_KEY" \
         --boot-disk-auto-delete \
         --tags=firewall \
-        --labels=type=firewall
+        --labels=type=firewall \
+        --can-ip-forward
 
 FIREWALL_MGMT_EXIP=$(gcloud compute instances describe $INSTANCE_NAME --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
 
