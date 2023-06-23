@@ -148,34 +148,33 @@ echo -e "When firewall boots up use the following commands to set password:\n\n#
 ssh -o "HostKeyAlgorithms=+ssh-rsa" -o "StrictHostKeyChecking no" -i ~/.ssh/id_rsa admin@$FIREWALL_MGMT_EXIP
 
 #API_KEY="API KEY"
-#X-PAN-KEY="X PAN KEY"
 
 : '
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"hostname": "pa-fw-01"}' https://$FIREWALL_MGMT_EXIP/api/?type=op&cmd=<request><system><hostname></hostname></system></request>
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"hostname": "pa-fw-01"}' https://$FIREWALL_MGMT_EXIP/api/?type=op&cmd=<request><system><hostname></hostname></system></request>
 
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"type": "layer3", "dhcp": "client"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/ethernet/entry[@name='ethernet1/1']/layer3
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"interface-management-profile": "allow-ping"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/ethernet/entry[@name='ethernet1/1']/layer3
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"type": "layer3", "dhcp": "client"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/ethernet/entry[@name='ethernet1/1']/layer3
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"interface-management-profile": "allow-ping"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/ethernet/entry[@name='ethernet1/1']/layer3
 ...
 
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"ping": "yes"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/shared/network/profiles/interface-management-profile/entry[@name='allow-ping']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"ping": "yes"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/shared/network/profiles/interface-management-profile/entry[@name='allow-ping']
 
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"interface": ["ethernet1/1", "ethernet1/2", "ethernet1/3"]}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/virtual-router/entry[@name='default']/interface
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"interface": ["ethernet1/1", "ethernet1/2", "ethernet1/3"]}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/virtual-router/entry[@name='default']/interface
 
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"ip": {"static-route": [{"name": "default-route", "destination": "0.0.0.0/0", "nexthop": {"ip-address": "192.168.1.1"}, "interface": "ethernet1/1", "route-table": "unicast", "metric": "10"}]}}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/virtual-router/entry[@name='default']/routing-table/ip
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"ip": {"static-route": [{"name": "default-route", "destination": "0.0.0.0/0", "nexthop": {"ip-address": "192.168.1.1"}, "interface": "ethernet1/1", "route-table": "unicast", "metric": "10"}]}}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/virtual-router/entry[@name='default']/routing-table/ip
 
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/1"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='untrust']
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/2"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='trust']
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/3"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='dmz']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/1"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='untrust']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/2"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='trust']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"network": "layer3", "interface": "ethernet1/3"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/zone/entry[@name='dmz']
 
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"color": "color22"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='trust']
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"color": "color1"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='untrust']
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"color": "color21"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='dmz']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"color": "color22"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='trust']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"color": "color1"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='untrust']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"color": "color21"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/tag/entry[@name='dmz']
 
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"to": ["dmz", "untrust"], "from": "trust", "action": "allow"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='trust-to-other-permit']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"to": ["dmz", "untrust"], "from": "trust", "action": "allow"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/security/rules/entry[@name='trust-to-other-permit']
 ...
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"to": "untrust", "from": ["dmz", "trust"], "source-translation": {"dynamic-ip-and-port": {"interface-address": "interface ethernet1/1"}}}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules/entry[@name='internet-access']
-curl -X POST -H "$X-PAN-KEY: $API_KEY" -d '{"interface": ["ethernet1/1", "ethernet1/2", "ethernet1/3"]}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/import
-curl -X POST -H "$X-PAN-KEY: $API_KEY" https://$FIREWALL_MGMT_EXIP/api/?type=commit&cmd=<commit></commit>
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"to": "untrust", "from": ["dmz", "trust"], "source-translation": {"dynamic-ip-and-port": {"interface-address": "interface ethernet1/1"}}}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/vsys/entry[@name='vsys1']/rulebase/nat/rules/entry[@name='internet-access']
+curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"interface": ["ethernet1/1", "ethernet1/2", "ethernet1/3"]}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/import
+curl -X POST -H "X-PAN-KEY: $API_KEY" https://$FIREWALL_MGMT_EXIP/api/?type=commit&cmd=<commit></commit>
 '
 
 
