@@ -61,6 +61,7 @@ echo " "
 #------------------------------------------------------------------------------------
 # create a VPC
 #------------------------------------------------------------------------------------
+gcloud compute networks delete default
 
 # Define the subnet configurations
 SUBNETS=(
