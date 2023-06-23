@@ -150,6 +150,8 @@ ssh -o "HostKeyAlgorithms=+ssh-rsa" -o "StrictHostKeyChecking no" -i ~/.ssh/id_r
 #API_KEY="API KEY"
 
 : '
+curl -ku user:pass https://$FIREWALL_MGMT_EXIP/$API_KEY -d type=config -d action=multi-config > --data-urlencode element@multi-config.xml
+
 curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"hostname": "pa-fw-01"}' https://$FIREWALL_MGMT_EXIP/api/?type=op&cmd=<request><system><hostname></hostname></system></request>
 
 curl -X POST -H "X-PAN-KEY: $API_KEY" -d '{"type": "layer3", "dhcp": "client"}' https://$FIREWALL_MGMT_EXIP/api/?type=config&action=set&xpath=/config/devices/entry[@name='localhost.localdomain']/network/interface/ethernet/entry[@name='ethernet1/1']/layer3
