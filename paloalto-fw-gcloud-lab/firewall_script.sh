@@ -148,6 +148,9 @@ gcloud compute instances create trust-instance-1 \
     --machine-type=n1-standard-1 \
     --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=trust-subnet \
     --can-ip-forward \
+    --metadata=startup-script="#! /bin/bash
+    apt-get update
+    apt-get install -y net-tools w3m nginx" \
     --quiet
 gcloud compute instances create dmz-instance-1 \
     --project=$PROJECT_ID \
@@ -155,6 +158,9 @@ gcloud compute instances create dmz-instance-1 \
     --machine-type=n1-standard-1 \
     --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=dmz-subnet \
     --can-ip-forward \
+    --metadata=startup-script="#! /bin/bash
+    apt-get update
+    apt-get install -y net-tools w3m nginx" \
     --quiet
 sleep 500
 
