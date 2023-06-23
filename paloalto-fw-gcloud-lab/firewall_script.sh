@@ -142,6 +142,20 @@ while ! ping -c1 $FIREWALL_MGMT_EXIP &> /dev/null; do
 done
 clear
 echo -e "\n\n$FIREWALL_MGMT_EXIP is now reachable . we should wait 10 minutes to complete booting process\n"
+gcloud compute instances create trust-instance-1 \
+    --project=$PROJECT_ID \
+    --zone=$ZONE \
+    --machine-type=n1-standard-1 \
+    --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=trust-subnet \
+    --can-ip-forward \
+    --quiet
+gcloud compute instances create dmz-instance-1 \
+    --project=$PROJECT_ID \
+    --zone=$ZONE \
+    --machine-type=n1-standard-1 \
+    --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=dmz-subnet \
+    --can-ip-forward \
+    --quiet
 sleep 500
 
 echo -e "When firewall boots up use the following commands to set password:\n\n# configure\n# set mgt-config users admin password\n\n"
