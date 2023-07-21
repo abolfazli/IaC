@@ -117,7 +117,7 @@ for SUBNET in "${SUBNETS[@]}"; do
        --enable-logging \
        --logging-metadata=exclude-all
 done
-gcloud compute routes delete default-management-subnet-internet-route default-untrust-subnet1-internet-route default-untrust-subnet2-internet-route 
+gcloud compute routes delete default-management-subnet-internet-route default-untrust-subnet1-internet-route default-untrust-subnet2-internet-route  --quiet
 clear
 gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com runtimeconfig.googleapis.com
 #gcloud compute images list --project paloaltonetworksgcp-public --no-standard-images --uri | grep vmseries-flex-bundle2-11
