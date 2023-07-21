@@ -61,7 +61,11 @@ echo " "
 #------------------------------------------------------------------------------------
 # create a VPC
 #------------------------------------------------------------------------------------
-gcloud compute networks delete default
+gcloud compute firewall-rules delete default-allow-icmp --quiet
+gcloud compute firewall-rules delete default-allow-internal --quiet
+gcloud compute firewall-rules delete default-allow-rdp --quiet
+gcloud compute firewall-rules delete default-allow-ssh --quiet
+gcloud compute networks delete default --quiet
 
 # Define the subnet configurations
 SUBNETS=(
