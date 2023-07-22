@@ -152,7 +152,7 @@ gcloud compute instances create trust-instance-1 \
     --machine-type=n1-standard-1 \
     --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=trust-subnet \
     --can-ip-forward \
-    --metadata=ssh-keys="$SSH_KEY" startup-script="#! /bin/bash
+    --metadata=ssh-keys="$SSH_KEY",startup-script="#! /bin/bash
     apt-get update
     apt-get install -y net-tools w3m nginx" \
     --quiet
@@ -162,7 +162,7 @@ gcloud compute instances create dmz-instance-1 \
     --machine-type=n1-standard-1 \
     --network-interface=network-tier=PREMIUM,stack-type=IPV4_ONLY,subnet=dmz-subnet \
     --can-ip-forward \
-    --metadata=ssh-keys="$SSH_KEY" startup-script="#! /bin/bash
+    --metadata=ssh-keys="$SSH_KEY",startup-script="#! /bin/bash
     apt-get update
     apt-get install -y net-tools w3m nginx" \
     --quiet
