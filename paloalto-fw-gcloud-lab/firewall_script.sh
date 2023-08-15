@@ -124,7 +124,7 @@ gcloud services enable compute.googleapis.com deploymentmanager.googleapis.com r
 gcloud compute instances create $INSTANCE_NAME \
         --description="Palo Alto Firewall" \
         --zone=$ZONE \
-        --create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE_NAME,image=projects/paloaltonetworksgcp-public/global/images/vmseries-flex-bundle2-1101,mode=rw,size=60 \
+        --create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE_NAME,image=projects/paloaltonetworksgcp-public/global/images/vmseries-flex-bundle2-1102,mode=rw,size=60 \
         --maintenance-policy=TERMINATE \
         --machine-type=n2-standard-8 \
         --network-interface=network-tier=PREMIUM,network=management-subnet,subnet=management-subnet \
