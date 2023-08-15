@@ -154,7 +154,9 @@ gcloud compute instances create trust-instance-1 \
     --can-ip-forward \
     --metadata=ssh-keys="$SSH_KEY",startup-script="#! /bin/bash
     apt-get update
-    apt-get install -y net-tools w3m nginx" \
+    apt-get install -y net-tools w3m nginx
+    curl -O https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
+    chmod +x wireguard-install.sh" \
     --quiet
 gcloud compute instances create dmz-instance-1 \
     --project=$PROJECT_ID \
@@ -164,7 +166,9 @@ gcloud compute instances create dmz-instance-1 \
     --can-ip-forward \
     --metadata=ssh-keys="$SSH_KEY",startup-script="#! /bin/bash
     apt-get update
-    apt-get install -y net-tools w3m nginx" \
+    apt-get install -y net-tools w3m nginx
+    curl -O https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
+    chmod +x wireguard-install.sh" \
     --quiet
 sleep 500
 
