@@ -1,0 +1,168 @@
+Below is the improved documentation-style version of your notes, formatted for inclusion in a GitHub repository:
+
+Installing EVE-NG Community Edition on GCP
+
+This guide provides step-by-step instructions for deploying EVE-NG Community Edition on Google Cloud Platform (GCP) with enhanced functionality such as HTTPS and WireGuard installation.
+
+Prerequisites
+
+	1.	Install Google Cloud SDK
+Install the gcloud CLI on your macOS system if not already installed. This process will also update Python.
+GCP SDK Installation Guide
+After installation, source your .zshrc file:
+
+source ~/.zshrc
+
+
+	2.	Create a Project on GCP
+Log in to GCP and create a new project for hosting your EVE-NG instance.
+
+Step 1: Create a Nested Ubuntu Image
+
+Run the following command in the Cloud Shell to create a nested Ubuntu 22.04 image:
+
+gcloud compute images create nested-ubuntu-jammy \
+    --source-image-family=ubuntu-2204-lts \
+    --source-image-project=ubuntu-os-cloud \
+    --licenses=https://www.googleapis.com/compute/v1/projects/vm-options/global/licenses/enable-vmx
+
+Step 2: Create the Virtual Machine (VM)
+
+	1.	Configure the VM:
+	•	Machine Type: General purpose - N2-Custom-8vCPU-64RAM
+	•	Boot Disk:
+	•	Custom Image: nested-ubuntu-jammy
+	•	Disk Type: SSD Persistent Disk
+	•	Size: 100 GB
+	•	Firewall: Allow HTTP and HTTPS.
+	•	Advanced Options:
+	•	Enable IP Forwarding.
+	•	Configure network interfaces if needed.
+	•	Manually add SSH keys (do not add user:ssh-key).
+	2.	Instance Scheduling:
+Create an instance schedule to stop the VM daily at 10 PM EST:
+
+gcloud compute resource-policies create instance-schedule my-schedule \
+    --project=YOUR_PROJECT_ID \
+    --region=us-central1 \
+    --description="Stop VM schedule" \
+    --vm-stop-schedule="0 22 * * *" \
+    --timezone="EST"
+
+
+	3.	Allow VPC Firewall Rules:
+Ensure that SSH and required ports are allowed in your VPC firewall.
+
+Step 3: SSH Into the Server
+
+Connect to your VM from macOS:
+
+ssh -i id_rsa USERNAME@INSTANCE_IP
+
+Alternatively, use the GCP CLI:
+
+gcloud compute ssh USERNAME@INSTANCE_NAME
+
+Step 4: Install EVE-NG
+
+	1.	Switch to root:
+
+sudo -i
+
+
+	2.	Install EVE-NG:
+
+wget -O - https://www.eve-ng.net/jammy/install-eve.sh | bash -i
+apt update
+apt upgrade
+reboot
+
+
+	3.	Configure root password and set the IP to DHCP:
+	•	Press Ctrl+C to interrupt boot.
+	•	Run sudo -i to continue configuration.
+
+Step 5: Enable HTTPS for EVE-NG
+
+	1.	Enable SSL module and create a self-signed certificate:
+
+sudo a2enmod ssl
+sudo openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+    -keyout /etc/ssl/private/apache-selfsigned.key \
+    -out /etc/ssl/certs/apache-selfsigned.crt
+
+
+	2.	Configure SSL for Apache:
+
+cat << EOF > /etc/apache2/sites-enabled/default-ssl.conf
+<IfModule mod_ssl.c>
+    <VirtualHost _default_:443>
+        ServerAdmin webmaster@localhost
+        DocumentRoot /opt/unetlab/html/
+        ErrorLog /opt/unetlab/data/Logs/ssl-error.log
+        CustomLog /opt/unetlab/data/Logs/ssl-access.log combined
+        SSLEngine on
+        SSLCertificateFile    /etc/ssl/certs/apache-selfsigned.crt
+        SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+    </VirtualHost>
+</IfModule>
+EOF
+
+
+	3.	Restart Apache:
+
+/etc/init.d/apache2 restart
+
+Step 6: Reserve a Static Public IP
+
+Promote the instance’s public IP to a static IP:
+Navigate to VPC Network > IP Addresses in the GCP console.
+
+Step 7: Install WireGuard
+
+	1.	Enable IP forwarding:
+
+sudo vi /etc/sysctl.conf
+net.ipv4.ip_forward=1
+sudo sysctl -p
+
+
+	2.	Install WireGuard:
+
+wget https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
+chmod +x wireguard-install.sh
+./wireguard-install.sh
+
+Step 8: Configure Network Interfaces
+
+Edit network settings:
+
+vi /etc/network/interfaces
+
+Add the following:
+
+iface eth1 inet manual
+auto pnet1
+iface pnet1 inet static
+    address 172.16.1.1
+    netmask 255.255.255.0
+    post-up ip route add 172.16.1.0/24 dev pnet1 proto kernel scope link src 172.16.1.1
+    pre-down ip route del 172.16.1.0/24 dev pnet1
+    bridge_ports none
+    bridge_stp off
+
+Restart networking:
+
+/etc/init.d/networking restart
+
+Step 9: Upload Cisco Router Images
+
+	1.	Upload the router image to /opt/unetlab/addons/qemu/.
+	2.	Fix permissions:
+
+/opt/unetlab/wrappers/unl_wrapper -a fixpermissions
+
+
+	3.	Connect the router to pnet1 and assign the IP 172.16.1.1.
+
+This document provides all essential steps to deploy and configure EVE-NG Community Edition on GCP. For additional support, visit the EVE-NG Documentation.
